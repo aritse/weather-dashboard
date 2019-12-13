@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Weather Dashboard</h1>
+    <div>
+        <div id="left-div">
+            <form id="search-form" action="submit">
+                <h3>
+                    Search for a city:
+                </h3>
+                <input type="text">
+                <button id="search-button">
+                    <img src="search.png" alt="search">
+                </button>
+            </form>
+            <ul id="cities-ul">
+
+                <!-- history -->
+            </ul>
+        </div>
+        <div id="right-div">
+            <div id="today-div">
+                <h3 id="current-city-h3">
+                    <span id="current-city-span">
+                    </span>
+                    <span id="current-date-span">
+                    </span>
+                    <span id="weather-icon-span">
+                        <img id="weather-icon">
+                    </span>
+                </h3>
+                <ul id="weather-ul">
+                    <li>Temperature:
+                        <span id="temperature-span">
+                        </span>
+                    </li>
+                    <li>Humidity:
+                        <span id="humidity-span">
+                        </span>
+                    </li>
+                    <li>Wind Speed:
+                        <span id="wind-speed-span">
+                        </span>
+                    </li>
+                    <li>UV Index:
+                        <span id="uv-index-span">
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div id="forecast-div">
+                <h3>5-Day Forecast:</h3>
+                <ul id="forecast-ul">
+                    <li id="day1">
+                        <div class="date"></div>
+                        <div class="icon"> <img> </div>
+                        <div class="temp"></div>
+                        <div class="humidity"></div>
+                    </li>
+                    <li id="day2">
+                        <div class="date"></div>
+                        <div class="icon"> <img> </div>
+                        <div class="temp"></div>
+                        <div class="humidity"></div>
+                    </li>
+                    <li id="day3">
+                        <div class="date"></div>
+                        <div class="icon"> <img> </div>
+                        <div class="temp"></div>
+                        <div class="humidity"></div>
+                    </li>
+                    <li id="day4">
+                        <div class="date"></div>
+                        <div class="icon"> <img> </div>
+                        <div class="temp"></div>
+                        <div class="humidity"></div>
+                    </li>
+                    <li id="day5">
+                        <div class="date"></div>
+                        <div class="icon"> <img> </div>
+                        <div class="temp"></div>
+                        <div class="humidity"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

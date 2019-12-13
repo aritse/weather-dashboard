@@ -1,0 +1,24 @@
+h1 {
+  font-size: xx-large;
+  background-color: rgb(58, 57, 57);
+  color: white;
+  padding: 2vw;
+  text-align: center;
+}
+
+#left-div {
+  display: inline-block;
+  background-color: lightgray;
+}
+
+#right-div {
+  display: inline-block;
+}
+
+#forecast-ul > li {
+  display: inline-block;
+}
+
+#search-button > img {
+  width: 30px;
+}
