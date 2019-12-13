@@ -1,140 +1,77 @@
-const key = "37300038cc70b396e019d4f86fd98ae4"; // openweather
-const key2 = "AIzaSyAOtVgodEW3JPEK2tlDLr4jv7hth0B5COE"; // google
-const baseUrlWeather = "http://api.openweathermap.org/data/2.5/weather";
+const keyOpenWeather = "37300038cc70b396e019d4f86fd98ae4";
+const apiWeather = "http://api.openweathermap.org/data/2.5/weather?units=imperial&appid=" + keyOpenWeather;
+const apiForecast = "http://api.openweathermap.org/data/2.5/forecast?units=imperial&appid=" + keyOpenWeather;
+const apiUVI = "http://api.openweathermap.org/data/2.5/uvi?appid=" + keyOpenWeather;
 const baseUrlIcon = "http://openweathermap.org/img/wn/";
-const baseUrlUV = "http://api.openweathermap.org/data/2.5/uvi";
-const baseUrlForecast = "http://api.openweathermap.org/data/2.5/forecast";
-const baseUrlGoogle = "https://maps.googleapis.com/maps/api/js";
 
-function currentWeather(lat, lon) {
-  var urlWeather = baseUrlWeather + "?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
-  $.ajax({ url: urlWeather, method: "get" }).then(res => {
-    $("#current-city-span").text(res.name);
-    urlIcon = baseUrlIcon + res.weather[0].icon + "@2x.png";
-    $("#weather-icon").attr({ src: urlIcon, alt: "weather icon" });
-    $("#current-date-span").text(moment().format("(MM/DD/YYYY)"));
-    $("#temperature-span").text(res.main.temp.toFixed(1) + " F");
-    $("#humidity-span").text(res.main.humidity + "%");
-    $("#wind-speed-span").text(res.wind.speed.toFixed(1) + " MPH");
-  });
-
-  var urlUv = baseUrlUV + "?lat=" + lat + "&lon=" + lon + "&appid=" + key;
-  $.ajax({ url: urlUv, method: "get" }).then(res => {
-    var uvIndex = res.value.toFixed(2);
-    var element = $("#uv-index-span");
-    if (uvIndex <= 2) element.css("background-color", "green");
-    else if (uvIndex <= 5) element.css("background-color", "yellow");
-    else if (uvIndex <= 7) element.css("background-color", "orange");
-    else if (uvIndex <= 10) element.css("background-color", "red");
-    else element.css("background-color", "purple");
-    element.css("color", "white");
-    element.text(uvIndex);
-  });
-}
-
-function forecast(lat, lon) {
-  var urlForecast = baseUrlForecast + "?lat=" + lat + "&lon=" + lon + "&appid=" + key + "&units=imperial";
-  $.ajax({ url: urlForecast, method: "get" }).then(res => {
-    for (let i = 1; i < 6; i++) {
-      const day = res.list[(i - 1) * 8 + 4];
-      var date = moment().add(i, "days");
-      date = date.format("MM/DD/YYYY");
-      var li = $("<li>").attr("id", "day" + i);
-      li.append(
-        $("<div>")
-          .addClass("date")
-          .text(date)
-      );
-      var urlIcon = baseUrlIcon + day.weather[0].icon + "@2x.png";
-      var img = $("<img>")
-        .attr("src", urlIcon)
-        .attr("attr", "weather icon");
-      li.append(
-        $("<div>")
-          .addClass("icon")
-          .append(img)
-      );
-      li.append(
-        $("<div>")
-          .addClass("temp")
-          .text("Temp: " + day.main.temp.toFixed(2) + " F")
-      );
-
-      li.append(
-        $("<div>")
-          .addClass("humidity")
-          .text("Humidity: " + day.main.humidity + "%")
-      );
-      $("#forecast-ul").append(li);
-      console.log(day);
-    }
-  });
-}
-
-function showWeather(loc) {
-  const [lat, lon] = [loc.coords.latitude.toFixed(2), loc.coords.longitude.toFixed(2)];
-  currentWeather(lat, lon);
-  forecast(lat, lon);
-}
-
-window.onload = navigator.geolocation.getCurrentPosition(showWeather);
-
-$("#search-form").submit(event => {
+function handle(event) {
   event.preventDefault();
-  var city = $("input").val();
-  console.log("Searching: ", city);
-  currentWeather2(city);
-  forecast2(city);
-});
+  const city = $("#city").val();
+  currentWeather(null, null, city);
+  forecast(null, null, city);
+}
 
-function currentWeather2(city) {
-  var lat, lon;
-  var urlWeather = baseUrlWeather + "?q=" + city + "&appid=" + key + "&units=imperial";
-  $.ajax({ url: urlWeather, method: "get" }).then(res => {
-    console.log(res);
-    $("#current-city-span").text(res.name);
-    urlIcon = baseUrlIcon + res.weather[0].icon + "@2x.png";
-    $("#weather-icon").attr({ src: urlIcon, alt: "weather icon" });
-    $("#current-date-span").text(moment().format("(MM/DD/YYYY)"));
-    $("#temperature-span").text(res.main.temp.toFixed(1) + " F");
-    $("#humidity-span").text(res.main.humidity + "%");
-    $("#wind-speed-span").text(res.wind.speed.toFixed(1) + " MPH");
-    lat = res.coord.lat;
-    lon = res.coord.lon;
-    console.log(lat, lon);
+function showWeather(position) {
+  const latitude = position.coords.latitude.toFixed(2);
+  const longitude = position.coords.longitude.toFixed(2);
+  currentWeather(latitude, longitude, null);
+  forecast(latitude, longitude, null);
+}
+
+function currentWeather(lat, lon, city) {
+  // console.log("lat: ", lat, " lon: ", lon, " city: ", city);
+  var url = apiWeather;
+  url += city ? `&q=${city}` : `&lat=${lat}&lon=${lon}`;
+  // console.log("weather url: ", url);
+  $.ajax({ url: url, method: "get" }).then(res => {
+    [lat, lon] = [res.coord.lat, res.coord.lon];
+    city = res.name;
+    // console.log("city name: ", city);
+
+    $("#current-city").text(city);
+    console.log("Today: ", today.format("MM/DD/YYYY"));
+    $("#current-date").text(today.format("MM/DD/YYYY"));
+    $("#current-temp").text(res.main.temp.toFixed(1) + "F");
+    $("#current-humidity").text(res.main.humidity + "%");
+    $("#wind-speed").text(res.wind.speed.toFixed(1) + "MPH");
+
+    const urlIcon = baseUrlIcon + res.weather[0].icon + "@2x.png";
+    $("#current-weather-icon").attr("src", urlIcon);
   });
 
-  var urlUv = baseUrlUV + "?lat=" + lat + "&lon=" + lon + "&appid=" + key;
-  $.ajax({ url: urlUv, method: "get" }).then(res => {
-    var uvIndex = res.value.toFixed(2);
-    var element = $("#uv-index-span");
-    if (uvIndex <= 2) element.css("background-color", "green");
-    else if (uvIndex <= 5) element.css("background-color", "yellow");
-    else if (uvIndex <= 7) element.css("background-color", "orange");
-    else if (uvIndex <= 10) element.css("background-color", "red");
-    else element.css("background-color", "purple");
-    element.css("color", "white");
-    element.text(uvIndex);
+  url = apiUVI + `&lat=${lat}&lon=${lon}`;
+  $.ajax({ url: url, method: "get" }).then(res => {
+    const index = res.value.toFixed(2);
+    const uv = $("#uv-index");
+    if (index <= 2) uv.css("background-color", "green");
+    else if (index <= 5) uv.css("background-color", "yellow");
+    else if (index <= 7) uv.css("background-color", "orange");
+    else if (index <= 10) uv.css("background-color", "red");
+    else uv.css("background-color", "purple");
+    uv.text(index);
   });
 }
 
-function forecast2(city) {
-  var urlForecast = baseUrlForecast + "?q=" + city + "&appid=" + key + "&units=imperial";
-  $.ajax({ url: urlForecast, method: "get" }).then(res => {
-    for (let i = 1; i < 6; i++) {
-      const day = res.list[(i - 1) * 8 + 4];
-      var date = moment().add(i, "days");
-      var li = $("#day" + i);
+function forecast(lat, lon, city) {
+  var url = apiForecast;
+  url += city ? `&q=${city},us` : `&lat=${lat}&lon=${lon}`;
 
-      date = date.format("MM/DD/YYYY");
+  $.ajax({ url: url, method: "get" }).then(res => {
+    for (let i = 0; i < 5; i++) {
+      const noon = res.list[i * 8 + 4];
+      const date = today.add(i + 1, "days");
+      const li = $("#day" + (i + 1));
 
-      $(li + ">.date").text(date);
-      var urlIcon = baseUrlIcon + day.weather[0].icon + "@2x.png";
+      $(li + ">.date").text(date.format("MM/DD/YYYY"));
+      $(li + ">.temp").text("Temp: " + noon.main.temp.toFixed(2) + "F");
+      $(li + ">.humidity").text("Temp: " + noon.main.humidity.toFixed(2) + "%");
+
+      const urlIcon = baseUrlIcon + noon.weather[0].icon + "@2x.png";
       $(li + ">.icon>img").attr("src", urlIcon);
-      $(li + ">.temp").text("Temp: " + day.main.temp.toFixed(2) + " F");
-      $(li + ">.humidity").text("Temp: " + day.main.humidity.toFixed(2) + "%");
-
-      console.log(day);
     }
   });
 }
+
+var today = moment();
+navigator.geolocation.getCurrentPosition(showWeather);
+$("#city-search").submit(handle);
