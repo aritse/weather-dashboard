@@ -1,73 +1,115 @@
-const keyOpenWeather = "37300038cc70b396e019d4f86fd98ae4";
-const apiWeather = "http://api.openweathermap.org/data/2.5/weather?units=imperial&appid=" + keyOpenWeather;
-const apiForecast = "http://api.openweathermap.org/data/2.5/forecast?units=imperial&appid=" + keyOpenWeather;
-const apiUVI = "http://api.openweathermap.org/data/2.5/uvi?appid=" + keyOpenWeather;
-const baseUrlIcon = "http://openweathermap.org/img/wn/";
+const API_WEATHER = "http://api.openweathermap.org/data/2.5/weather?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const API_FORECAST = "http://api.openweathermap.org/data/2.5/forecast?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const API_UV_INDEX = "http://api.openweathermap.org/data/2.5/uvi?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
 
-function forecast5Days(lat, lon, city) {
-  var today = moment();
-  var url = apiForecast;
-  url += city ? `&q=${city},us` : `&lat=${lat}&lon=${lon}`;
-  $.ajax({ url: url, method: "get" }).then(res => {
-    for (let i = 0; i < 5; i++) {
-      const midday = res.list[i * 8 + 4];
-      const date = today.add(i + 1, "days");
-      const li = $("#day" + (i + 1));
+window.onload = showSearchHistory;
+navigator.geolocation.getCurrentPosition(fetchWeather);
+$("#search-form").submit(searchCity);
+$("#cities").on("click", "button", searchAgain);
 
-      $(`#forecast li:nth-child(${i + 1}) div.date`).text(date.format("MM/DD/YYYY"));
-      $(`#forecast li:nth-child(${i + 1}) div.temp`).text("Temp: " + midday.main.temp.toFixed(2) + "F");
-      $(`#forecast li:nth-child(${i + 1}) div.humidity`).text("Humidity: " + midday.main.humidity.toFixed(2) + "%");
-      const urlIcon = baseUrlIcon + midday.weather[0].icon + "@2x.png";
-      $(`#forecast li:nth-child(${i + 1}) div.icon img`).attr("src", urlIcon);
-    }
-  });
+function searchCity(event) {
+  event.preventDefault();
+  const city = $("#city-input").val();
+  if (city) {
+    $("#city-input").val("");
+    fetchWeather(city.toUpperCase());
+    addToSearchHistory(city);
+    showSearchHistory();
+  }
+}
+
+function searchAgain() {
+  const city = $(this).text();
+  fetchWeather(city);
+}
+
+function fetchWeather(loc) {
+  var [city, lat, lon] = [null, null, null];
+
+  if (typeof loc == "string") city = loc.toUpperCase();
+  else [lat, lon] = [loc.coords.latitude.toFixed(2), loc.coords.longitude.toFixed(2)];
+
+  currentWeather(lat, lon, city);
+  forecastWeather(lat, lon, city);
 }
 
 function currentWeather(lat, lon, city) {
-  var today = moment();
-  var url = apiWeather;
-  url += city ? `&q=${city}` : `&lat=${lat}&lon=${lon}`;
-  $.ajax({ url: url, method: "get" }).then(res => {
-    [lat, lon] = [res.coord.lat, res.coord.lon];
+  const now = moment();
+  var urlWeather = API_WEATHER;
 
-    $("#current-city").text(res.name);
-    $("#current-date").text(today.format("MM/DD/YYYY"));
-    $("#current-temp").text(res.main.temp.toFixed(1) + "F");
-    $("#current-humidity").text(res.main.humidity + "%");
-    $("#wind-speed").text(res.wind.speed.toFixed(1) + "MPH");
+  if (city) urlWeather += "&q=" + city;
+  else urlWeather += "&lat=" + lat + "&lon=" + lon;
 
-    const urlIcon = baseUrlIcon + res.weather[0].icon + "@2x.png";
-    $("#current-weather-icon").attr("src", urlIcon);
+  $.ajax({ url: urlWeather, method: "get" }).then(response => {
+    [lat, lon] = [response.coord.lat, response.coord.lon];
 
-    url = apiUVI + `&lat=${lat}&lon=${lon}`;
-    $.ajax({ url: url, method: "get" }).then(uv => {
-      const index = uv.value.toFixed(2);
-      const elem = $("#uv-index");
-      if (index <= 2) elem.css("background-color", "green");
-      else if (index <= 5) elem.css("background-color", "yellow");
-      else if (index <= 7) elem.css("background-color", "orange");
-      else if (index <= 10) elem.css("background-color", "red");
-      else elem.css("background-color", "purple");
-      elem.text(index);
+    $("#city").text(response.name);
+    $("#now").text(now.format("(MM/DD/YYYY)"));
+    $("#curr-temp").text(response.main.temp.toFixed(1) + "F");
+    $("#curr-humid").text(response.main.humidity + "%");
+    $("#wind").text(response.wind.speed.toFixed(1) + "MPH");
+
+    const icon = response.weather[0].icon;
+    $("#curr-icon").attr("src", `http://openweathermap.org/img/wn/${icon}@2x.png`);
+
+    var urlUVIndex = API_UV_INDEX;
+    urlUVIndex += "&lat=" + lat + "&lon=" + lon;
+    $.ajax({ url: urlUVIndex, method: "get" }).then(response => {
+      const index = response.value.toFixed(2);
+      if (index <= 2) $("#uv").css("background-color", "green");
+      else if (index <= 5) $("#uv").css("background-color", "#f6d55c");
+      else if (index <= 7) $("#uv").css("background-color", "orange");
+      else if (index <= 10) $("#uv").css("background-color", "red");
+      else $("#uv").css("background-color", "purple");
+      $("#uv").text(index);
     });
   });
 }
 
-function showWeather(event) {
-  event.preventDefault();
-  const city = $("#city").val();
-  currentWeather(null, null, city);
-  forecast5Days(null, null, city);
-  var li = $("<li>").text(city);
-  $("#cities").prepend(li);
+function forecastWeather(lat, lon, city) {
+  var date = moment();
+  var urlForecast = API_FORECAST;
+
+  if (city) urlForecast += "&q=" + city;
+  else urlForecast += "&lat=" + lat + "&lon=" + lon;
+
+  $.ajax({ url: urlForecast, method: "get" }).then(response => {
+    for (let i = 1; i < 6; i++) {
+      const li = `#forecast li:nth-child(${i})`;
+      const snapshot = response.list[(i - 1) * 8];
+
+      date = date.add(1, "days");
+      const temp = snapshot.main.temp.toFixed(2);
+      const humidity = snapshot.main.humidity.toFixed(0);
+      const icon = snapshot.weather[0].icon;
+
+      $(li + " .date").text(date.format("MM/DD/YYYY"));
+      $(li + " .temp").text("Temp: " + temp + "F");
+      $(li + " .humid").text("Humidity: " + humidity + "%");
+      $(li + " .icon img").attr("src", `http://openweathermap.org/img/wn/${icon}@2x.png`);
+    }
+  });
 }
 
-function localWeather(position) {
-  const latitude = position.coords.latitude.toFixed(2);
-  const longitude = position.coords.longitude.toFixed(2);
-  currentWeather(latitude, longitude, null);
-  forecast5Days(latitude, longitude, null);
+function addToSearchHistory(city) {
+  var cities = JSON.parse(localStorage.getItem("cities"));
+  if (cities) {
+    for (let i = 0; i < cities.length; i++) {
+      if (city == cities[i]) return;
+    }
+    cities.push(city);
+  } else cities = [city];
+
+  localStorage.setItem("cities", JSON.stringify(cities));
 }
 
-navigator.geolocation.getCurrentPosition(localWeather);
-$("#city-search").submit(showWeather);
+function showSearchHistory() {
+  const history = $("#cities").empty();
+  const cities = JSON.parse(localStorage.getItem("cities"));
+  if (cities) {
+    cities.forEach(city => {
+      const li = $("<li>").html(`<button id="button-${city.toLowerCase()}">` + city + "</button>");
+      history.prepend(li);
+    });
+  }
+}
