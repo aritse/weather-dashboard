@@ -1,9 +1,41 @@
+body {
+  margin: 0%;
+}
+
 h1 {
   font-size: xx-large;
   background-color: rgb(58, 57, 57);
   color: white;
   padding: 2vw;
   text-align: center;
+  margin: 0%;
+}
+
+.split {
+  height: 50%;
+  position: fixed;
+  overflow-x: hidden;
+}
+
+#left-div {
+  width: 25%;
+  left: 0;
+}
+
+#right-div {
+  width: 75%;
+  right: 0;
+}
+
+/* done */
+
+#current-div {
+  border: 2px solid #80808094;
+  border-radius: 5px;
+}
+
+.forecast-day {
+  background-color: blue;
 }
 
 #left-div {
