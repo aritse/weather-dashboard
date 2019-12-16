@@ -74,18 +74,6 @@ h1 {
   width: 15%;
   border-radius: 5px;
   color: white;
-}
-
-/* #left-div {
-  display: inline-block;
-  background-color: lightgray;
-} */
-
-/* #right-div {
-  display: inline-block;
-} */
-
-#forecast > li {
   display: inline-block;
   padding: 5px;
 }
