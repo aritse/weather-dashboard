@@ -12,7 +12,7 @@ h1 {
 }
 
 .split {
-  height: 50%;
+  height: 70%;
   position: fixed;
   overflow-x: hidden;
 }
@@ -69,7 +69,11 @@ h1 {
 }
 
 .forecast-day {
-  background-color: blue;
+  background-color: #0788ff;
+  margin: 10px;
+  width: 15%;
+  border-radius: 5px;
+  color: white;
 }
 
 /* #left-div {
@@ -83,11 +87,16 @@ h1 {
 
 #forecast > li {
   display: inline-block;
+  padding: 5px;
 }
 
 #search-button {
   border: 2px solid aliceblue;
   border-radius: 5px;
+}
+
+#forecast-div h3 {
+  padding-left: 20px;
 }
 
 #search-button > img {
