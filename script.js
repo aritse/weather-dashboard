@@ -50,7 +50,7 @@ function currentWeather(lat, lon, city) {
     $("#wind").text(response.wind.speed.toFixed(1) + "MPH");
 
     const icon = response.weather[0].icon;
-    $("#curr-icon").attr("src", `http://openweathermap.org/img/wn/${icon}@2x.png`);
+    $("#curr-icon").attr("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
 
     var urlUVIndex = API_UV_INDEX;
     urlUVIndex += "&lat=" + lat + "&lon=" + lon;
@@ -86,7 +86,7 @@ function forecastWeather(lat, lon, city) {
       $(li + " .date").text(date.format("MM/DD/YYYY"));
       $(li + " .temp").text("Temp: " + temp + "F");
       $(li + " .humid").text("Humidity: " + humidity + "%");
-      $(li + " .icon img").attr("src", `http://openweathermap.org/img/wn/${icon}@2x.png`);
+      $(li + " .icon img").attr("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
     }
   });
 }
