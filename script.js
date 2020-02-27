@@ -1,6 +1,6 @@
-const API_WEATHER = "http://api.openweathermap.org/data/2.5/weather?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
-const API_FORECAST = "http://api.openweathermap.org/data/2.5/forecast?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
-const API_UV_INDEX = "http://api.openweathermap.org/data/2.5/uvi?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const API_WEATHER = "https://api.openweathermap.org/data/2.5/weather?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const API_FORECAST = "https://api.openweathermap.org/data/2.5/forecast?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const API_UV_INDEX = "https://api.openweathermap.org/data/2.5/uvi?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
 
 window.onload = showSearchHistory;
 navigator.geolocation.getCurrentPosition(fetchWeather);
