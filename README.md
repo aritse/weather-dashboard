@@ -8,6 +8,6 @@ Developers are often tasked with retrieving data from another application's API 
 ***
 ![Phone](screenshots/Phone.PNG)
 ***
-![Small Phone](screenshots/"SmallPhone.PNG")
+![SmallPhone](screenshots/SmallPhone.PNG)
 ***
-![Lighthouse](screenshots/"LighthouseReportSummary.PNG")
+![LighthouseReportSummary](screenshots/LighthouseReportSummary.PNG)
