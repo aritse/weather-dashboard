@@ -14,15 +14,7 @@ const searchForm = $("#search-form");
 const cityInput = $("#search-city");
 const cityList = $("#city-list");
 const clearButton = $("#clear-button");
-
-try {
-  navigator.geolocation.getCurrentPosition(position => {
-    currentWeather(position);
-    forecastWeather(position);
-  });
-} catch (error) {
-  console.log(error);
-}
+const currentLocation = $("#current-location");
 
 const currentWeather = ({ coords }, city) => {
   let weatherUrl;
@@ -109,6 +101,7 @@ const renderHistory = () => {
       const li = $(`<li class="list-group-item p-0">`).html(`<button class="form-control" id="${city}">${city}</button>`);
       cityList.prepend(li);
     });
+    getWeather(cities[cities.length - 1]);
   }
 };
 
@@ -136,6 +129,17 @@ cityList.on("click", "button", handleClick);
 clearButton.click(() => {
   localStorage.setItem("history", JSON.stringify([]));
   renderHistory();
+});
+
+currentLocation.click(() => {
+  try {
+    navigator.geolocation.getCurrentPosition(position => {
+      currentWeather(position);
+      forecastWeather(position);
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 window.onload = renderHistory;
