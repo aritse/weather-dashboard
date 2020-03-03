@@ -96,12 +96,14 @@ const addToHistory = city => {
 const renderHistory = () => {
   cityList.empty();
   const cities = JSON.parse(localStorage.getItem("history"));
-  if (cities) {
+  if (cities.length > 0) {
     cities.forEach(city => {
       const li = $(`<li class="list-group-item p-0">`).html(`<button class="form-control" id="${city}">${city}</button>`);
       cityList.prepend(li);
     });
     getWeather(cities[cities.length - 1]);
+  } else {
+    getWeather("Seattle");
   }
 };
 
