@@ -37,7 +37,7 @@ const renderCurrent = (data, uvi) => {
   currCity.text(data.name);
   currDate.text(`(${moment().format("MMM DD, YYYY")})`);
   currIcon.attr("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`);
-  currTemp.text(data.main.temp.toFixed() + "F");
+  currTemp.html(`<span>${data.main.temp.toFixed()}&deg;F</span>`);
   currWind.text(data.wind.speed.toFixed() + "MPH");
   currHumidity.text(data.main.humidity + "%");
 
@@ -70,7 +70,7 @@ const renderForecast = forecast => {
 
     const child = `#forecast div:nth-child(${i + 1})`;
     $(child + "> div .forecast-date").text(date);
-    $(child + "> div .forecast-temp").text("Temp: " + snapshot.main.temp.toFixed() + "F");
+    $(child + "> div .forecast-temp").html(`<span>Temp: ${snapshot.main.temp.toFixed()}&deg;F</span>`);
     $(child + "> div .forecast-humidity").text("Humidity: " + snapshot.main.humidity + "%");
     $(child + "> div .forecast-icon").attr("src", `https://openweathermap.org/img/wn/${snapshot.weather[0].icon}@2x.png`);
   }
