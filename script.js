@@ -1,115 +1,141 @@
-const API_WEATHER = "https://api.openweathermap.org/data/2.5/weather?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
-const API_FORECAST = "https://api.openweathermap.org/data/2.5/forecast?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
-const API_UV_INDEX = "https://api.openweathermap.org/data/2.5/uvi?appid=37300038cc70b396e019d4f86fd98ae4&units=imperial";
+const BASE_URL = "https://api.openweathermap.org/data/2.5";
+const API_KEY = "ec0bf3c7be59e4d4ddc5ee0876341115";
+const UNIT = "imperial";
 
-window.onload = showSearchHistory;
-navigator.geolocation.getCurrentPosition(fetchWeather);
-$("#search-form").submit(searchCity);
-$("#cities").on("click", "button", searchAgain);
+// DOM elements
+const currCity = $("#current-city");
+const currDate = $("#current-date");
+const currIcon = $("#current-weather-icon");
+const currTemp = $("#current-temp");
+const currWind = $("#current-wind-speed");
+const currHumidity = $("#current-humidity");
+const currentUvi = $("#current-uv");
+const searchForm = $("#search-form");
+const cityInput = $("#search-city");
+const cityList = $("#city-list");
+const clearButton = $("#clear-button");
 
-function searchCity(event) {
-  event.preventDefault();
-  const city = $("#city-input").val();
+try {
+  navigator.geolocation.getCurrentPosition(position => {
+    currentWeather(position);
+    forecastWeather(position);
+  });
+} catch (error) {
+  console.log(error);
+}
+
+const currentWeather = ({ coords }, city) => {
+  let weatherUrl;
   if (city) {
-    $("#city-input").val("");
-    fetchWeather(city.toUpperCase());
-    addToSearchHistory(city);
-    showSearchHistory();
+    weatherUrl = BASE_URL + `/weather?appid=${API_KEY}&units=${UNIT}&q=${city}`;
+  } else {
+    weatherUrl = BASE_URL + `/weather?appid=${API_KEY}&units=${UNIT}&lat=${coords.latitude.toFixed(2)}&lon=${coords.longitude.toFixed(2)}`;
   }
-}
 
-function searchAgain() {
-  const city = $(this).text();
-  fetchWeather(city);
-}
+  $.ajax(weatherUrl)
+    .then(res => {
+      const uviUrl = BASE_URL + `/uvi?appid=${API_KEY}&lat=${res.coord.lat}&lon=${res.coord.lon}`;
+      $.ajax(uviUrl).then(uvi => renderCurrent(res, uvi));
+    })
+    .catch(err => console.log(err));
+};
 
-function fetchWeather(loc) {
-  var [city, lat, lon] = [null, null, null];
+const renderCurrent = (data, uvi) => {
+  uvi = uvi.value.toFixed(2);
+  currCity.text(data.name);
+  currDate.text(`(${moment().format("MMM DD, YYYY")})`);
+  currIcon.attr("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`);
+  currTemp.text(data.main.temp.toFixed() + "F");
+  currWind.text(data.wind.speed.toFixed() + "MPH");
+  currHumidity.text(data.main.humidity + "%");
 
-  if (typeof loc == "string") city = loc.toUpperCase();
-  else [lat, lon] = [loc.coords.latitude.toFixed(2), loc.coords.longitude.toFixed(2)];
+  currentUvi.text(uvi);
+  if (uvi <= 2) currentUvi.css("background-color", "green");
+  else if (uvi <= 5) currentUvi.css("background-color", "orange");
+  else currentUvi.css("background-color", "red");
+};
 
-  currentWeather(lat, lon, city);
-  forecastWeather(lat, lon, city);
-}
+const forecastWeather = ({ coords }, city) => {
+  let forecastUrl;
+  if (city) {
+    forecastUrl = BASE_URL + `/forecast?appid=${API_KEY}&units=${UNIT}&q=${city}`;
+  } else {
+    forecastUrl = BASE_URL + `/forecast?appid=${API_KEY}&units=${UNIT}&lat=${coords.latitude.toFixed(2)}&lon=${coords.longitude.toFixed(2)}`;
+  }
 
-function currentWeather(lat, lon, city) {
-  const now = moment();
-  var urlWeather = API_WEATHER;
+  $.ajax(forecastUrl)
+    .then(res => renderForecast(res))
+    .catch(err => console.log(err));
+};
 
-  if (city) urlWeather += "&q=" + city;
-  else urlWeather += "&lat=" + lat + "&lon=" + lon;
+const renderForecast = forecast => {
+  for (let i = 0; i < 5; i++) {
+    const snapshot = forecast.list[i * 8];
 
-  $.ajax({ url: urlWeather, method: "get" }).then(response => {
-    [lat, lon] = [response.coord.lat, response.coord.lon];
+    const date = moment()
+      .add(i + 1, "days")
+      .format("MM/DD/YYYY");
 
-    $("#city").text(response.name);
-    $("#now").text(now.format("(MM/DD/YYYY)"));
-    $("#curr-temp").text(response.main.temp.toFixed(1) + "F");
-    $("#curr-humid").text(response.main.humidity + "%");
-    $("#wind").text(response.wind.speed.toFixed(1) + "MPH");
+    const child = `#forecast div:nth-child(${i + 1})`;
+    $(child + "> div .forecast-date").text(date);
+    $(child + "> div .forecast-temp").text("Temp: " + snapshot.main.temp.toFixed() + "F");
+    $(child + "> div .forecast-humidity").text("Humidity: " + snapshot.main.humidity + "%");
+    $(child + "> div .forecast-icon").attr("src", `https://openweathermap.org/img/wn/${snapshot.weather[0].icon}@2x.png`);
+  }
+};
 
-    const icon = response.weather[0].icon;
-    $("#curr-icon").attr("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
+const getWeather = city => {
+  currentWeather({}, city);
+  forecastWeather({}, city);
+};
 
-    var urlUVIndex = API_UV_INDEX;
-    urlUVIndex += "&lat=" + lat + "&lon=" + lon;
-    $.ajax({ url: urlUVIndex, method: "get" }).then(response => {
-      const index = response.value.toFixed(2);
-      if (index <= 2) $("#uv").css("background-color", "green");
-      else if (index <= 5) $("#uv").css("background-color", "#f6d55c");
-      else if (index <= 7) $("#uv").css("background-color", "orange");
-      else if (index <= 10) $("#uv").css("background-color", "red");
-      else $("#uv").css("background-color", "purple");
-      $("#uv").text(index);
-    });
-  });
-}
-
-function forecastWeather(lat, lon, city) {
-  var date = moment();
-  var urlForecast = API_FORECAST;
-
-  if (city) urlForecast += "&q=" + city;
-  else urlForecast += "&lat=" + lat + "&lon=" + lon;
-
-  $.ajax({ url: urlForecast, method: "get" }).then(response => {
-    for (let i = 1; i < 6; i++) {
-      const li = `#forecast li:nth-child(${i})`;
-      const snapshot = response.list[(i - 1) * 8];
-
-      date = date.add(1, "days");
-      const temp = snapshot.main.temp.toFixed(2);
-      const humidity = snapshot.main.humidity.toFixed(0);
-      const icon = snapshot.weather[0].icon;
-
-      $(li + " .date").text(date.format("MM/DD/YYYY"));
-      $(li + " .temp").text("Temp: " + temp + "F");
-      $(li + " .humid").text("Humidity: " + humidity + "%");
-      $(li + " .icon img").attr("src", `https://openweathermap.org/img/wn/${icon}@2x.png`);
-    }
-  });
-}
-
-function addToSearchHistory(city) {
-  var cities = JSON.parse(localStorage.getItem("cities"));
+const addToHistory = city => {
+  const cities = JSON.parse(localStorage.getItem("history"));
   if (cities) {
-    for (let i = 0; i < cities.length; i++) {
-      if (city == cities[i]) return;
+    if (!cities.includes(city)) {
+      cities.push(city);
+      localStorage.setItem("history", JSON.stringify(cities));
     }
-    cities.push(city);
-  } else cities = [city];
+  } else {
+    localStorage.setItem("history", JSON.stringify([city]));
+  }
+};
 
-  localStorage.setItem("cities", JSON.stringify(cities));
-}
-
-function showSearchHistory() {
-  const history = $("#cities").empty();
-  const cities = JSON.parse(localStorage.getItem("cities"));
+const renderHistory = () => {
+  cityList.empty();
+  const cities = JSON.parse(localStorage.getItem("history"));
   if (cities) {
     cities.forEach(city => {
-      const li = $("<li>").html(`<button id="button-${city.toLowerCase()}">` + city + "</button>");
-      history.prepend(li);
+      const li = $(`<li class="list-group-item p-0">`).html(`<button class="form-control" id="${city}">${city}</button>`);
+      cityList.prepend(li);
     });
   }
+};
+
+searchForm.submit(event => {
+  event.preventDefault();
+  const city = cityInput
+    .val()
+    .trim()
+    .toUpperCase();
+  if (city) {
+    cityInput.val("");
+    getWeather(city);
+    addToHistory(city);
+    renderHistory();
+  }
+});
+
+function handleClick() {
+  const city = $(this).text();
+  getWeather(city);
 }
+
+cityList.on("click", "button", handleClick);
+
+clearButton.click(() => {
+  localStorage.setItem("history", JSON.stringify([]));
+  renderHistory();
+});
+
+window.onload = renderHistory;
