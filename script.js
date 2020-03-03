@@ -96,7 +96,7 @@ const addToHistory = city => {
 const renderHistory = () => {
   cityList.empty();
   const cities = JSON.parse(localStorage.getItem("history"));
-  if (cities.length > 0) {
+  if (cities) {
     cities.forEach(city => {
       const li = $(`<li class="list-group-item p-0">`).html(`<button class="form-control" id="${city}">${city}</button>`);
       cityList.prepend(li);
@@ -129,8 +129,8 @@ function handleClick() {
 cityList.on("click", "button", handleClick);
 
 clearButton.click(() => {
-  localStorage.setItem("history", JSON.stringify([]));
-  renderHistory();
+  localStorage.removeItem("history");
+  cityList.empty();
 });
 
 currentLocation.click(() => {
