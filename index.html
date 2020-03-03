@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Weather dashboard app using the OpenWeather API to query weather data of cities and coordinates around the world">
     <title>Weather Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -24,13 +25,13 @@
                 <form id="search-form">
                     <div class="d-flex form-group">
                         <input id="search-city" type="text" class="form-control" placeholder="Search for a city">
-                        <button type="submit" class="btn btn-primary" style="width: 74px;">Search</button>
+                        <button type="submit" class="btn btn-primary" style="width:74px;background-color: #0b3b92;">Search</button>
                     </div>
                 </form>
                 <div class="card mt-3">
                     <div class="card-header pr-0 d-flex justify-content-between">
                         <div class="row align-items-center font-weight-bold"> Search history </div>
-                        <button id="clear-button" class="btn btn-primary" style="width: 74px;">Clear</button>
+                        <button id="clear-button" class="btn btn-primary" style="width: 74px; background-color: #0b3b92;">Clear</button>
                     </div>
                     <ul id="city-list" class="list-group list-group-flush">
                     </ul>
