@@ -23,6 +23,3 @@ Developers are often tasked with retrieving data from another application's API 
 ### Phone View
 ![Phone](screenshots/Phone.PNG)
 ***
-### Small Phone View
-![SmallPhone](screenshots/SmallPhone.PNG)
-***
