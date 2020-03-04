@@ -35,10 +35,10 @@ const currentWeather = ({ coords }, city) => {
 const renderCurrent = (data, uvi) => {
   uvi = uvi.value.toFixed(2);
   currCity.text(data.name);
-  currDate.text(`(${moment().format("MMM DD, YYYY")})`);
+  currDate.text(`(${moment().format("MM/DD/YYYY")})`);
   currIcon.attr("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`);
   currTemp.html(`<span>${data.main.temp.toFixed()}&deg;F</span>`);
-  currWind.text(data.wind.speed.toFixed() + "MPH");
+  currWind.text(data.wind.speed.toFixed() + "mph");
   currHumidity.text(data.main.humidity + "%");
 
   currentUvi.text(uvi);
