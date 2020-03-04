@@ -11,7 +11,7 @@ Developers are often tasked with retrieving data from another application's API 
 * Chrome Lighthouse Audit to improve perf
 * Moment.JS NPM package to do date calculations
 * PurgeCSS NPM package to remove unused CSS
-* Chrome DevTool to style and make the app responsiveness
+* Chrome DevTool to style and make the app responsive
 * Local Storage to store search history
 
 ### Desktop View
